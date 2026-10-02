@@ -7,6 +7,7 @@
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { diagLog } from "../pi-base/diag-log.js";
 import {
   applyEnvOverrides,
   CACHE_RETENTION_VALUES,
@@ -474,14 +475,14 @@ function parsePresetDefinitions(v: unknown): Record<string, PresetAnchorDef[]> |
   for (const [name, body] of Object.entries(v)) {
     if (name.length === 0) continue;
     if (!Array.isArray(body)) {
-      console.warn(`blackhole: compactAfterPresets["${name}"] is not an array; dropping preset`);
+      diagLog(`blackhole: compactAfterPresets["${name}"] is not an array; dropping preset`);
       continue;
     }
     const anchors = body
       .map(parsePresetAnchor)
       .filter((a): a is PresetAnchorDef => a !== undefined);
     if (anchors.length === 0) {
-      console.warn(
+      diagLog(
         `blackhole: compactAfterPresets["${name}"] has no valid anchors; dropping preset`,
       );
       continue;
@@ -738,7 +739,7 @@ function readJson(path: string): {
     return { data: JSON.parse(readFileSync(path, "utf-8")), error: null };
   } catch (e) {
     const msg = `blackhole: config file at ${path} has invalid JSON: ${(e as Error).message}. Using defaults.`;
-    console.warn(msg);
+    diagLog(msg);
     return { data: null, error: msg };
   }
 }
@@ -833,7 +834,7 @@ export function loadUnifiedConfig(cwd: string, onWarn?: WarnFn): UnifiedConfig {
     if (isCompaction(trimmed)) {
       merged.compaction = trimmed as "auto" | "manual" | "off";
     } else {
-      console.warn(`blackhole: invalid PI_BLACKHOLE_COMPACTION value "${envCompaction}"; ignoring`);
+      diagLog(`blackhole: invalid PI_BLACKHOLE_COMPACTION value "${envCompaction}"; ignoring`);
     }
   }
 
@@ -844,7 +845,7 @@ export function loadUnifiedConfig(cwd: string, onWarn?: WarnFn): UnifiedConfig {
     if (isCompactionEngine(trimmed)) {
       merged.compactionEngine = trimmed as "blackhole" | "pi-default";
     } else {
-      console.warn(
+      diagLog(
         `blackhole: invalid PI_BLACKHOLE_COMPACTION_ENGINE value "${envCompactionEngine}"; ignoring`,
       );
     }
@@ -857,7 +858,7 @@ export function loadUnifiedConfig(cwd: string, onWarn?: WarnFn): UnifiedConfig {
     if (isMidRunCompaction(trimmed)) {
       merged.midRunCompaction = trimmed as "resume" | "pause" | "off";
     } else {
-      console.warn(
+      diagLog(
         `blackhole: invalid PI_BLACKHOLE_MID_RUN_COMPACTION value "${envMidRunCompaction}"; ignoring`,
       );
     }
@@ -893,7 +894,7 @@ export function saveUnifiedConfig(settings: Partial<UnifiedConfig>): boolean {
     const existingResult = readJson(path);
     const existing = existingResult.data ?? {};
     if (existingResult.error) {
-      console.warn("blackhole: overwriting corrupt config file at " + path);
+      diagLog("blackhole: overwriting corrupt config file at " + path);
     }
     const next = { ...existing, ...settings };
     writeFileSync(path, `${JSON.stringify(next, null, 2)}\n`);
@@ -923,7 +924,7 @@ export function saveUnifiedConfigScoped(
     const existingResult = readJson(path);
     const existing = existingResult.data ?? {};
     if (existingResult.error) {
-      console.warn("blackhole: overwriting corrupt config file at " + path);
+      diagLog("blackhole: overwriting corrupt config file at " + path);
     }
     const next = { ...existing, ...settings };
     writeFileSync(path, `${JSON.stringify(next, null, 2)}\n`);
@@ -951,7 +952,7 @@ export function scaffoldConfig(): void {
       writeFileSync(path, `${JSON.stringify(DEFAULTS, null, 2)}\n`);
     }
   } catch (e) {
-    console.error("blackhole: config scaffold failed", e);
+    diagLog(`blackhole: config scaffold failed: ${e instanceof Error ? e.message : String(e)}`);
   }
 }
 

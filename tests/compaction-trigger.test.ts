@@ -10,6 +10,7 @@
  */
 import { join } from "node:path";
 import type { CompactionResult } from "@earendil-works/pi-coding-agent";
+import * as diagLogModule from "../src/pi-base/diag-log.js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
@@ -385,8 +386,10 @@ describe("V3 compaction trigger (blackhole)", () => {
       expect(ctx.compact).not.toHaveBeenCalled();
     });
 
-    it("headless stale bails use console.warn and never ui.notify", async () => {
-      const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    it("headless stale bails use the diag log and never ui.notify", async () => {
+      const warnSpy = vi
+        .spyOn(diagLogModule, "diagLog")
+        .mockImplementation(() => {});
       const { handler, runtime } = captureHandler({ compactAfterTokens: 3 });
 
       try {

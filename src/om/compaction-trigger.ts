@@ -4,6 +4,7 @@ import { autoCompactThreshold } from "./model-budget.js";
 import type { Runtime } from "./runtime.js";
 import { debugLog } from "./debug-log.js";
 import { RETRYABLE_ERROR_RE } from "./retryable-error.js";
+import { diagLog } from "../pi-base/diag-log.js";
 import {
   compactInlineAtTurnBoundary,
   InlineCompactionUnavailableError,
@@ -42,7 +43,7 @@ export const STALE_SKIP_WARN_MAX_SESSIONS = 100;
 /** Record a scheduled auto-compaction that was skipped because the extension
  * ctx went stale before the deferred microtask could run (issue #92).
  * Always bumps the process-wide counter; warns once per session — via the UI
- * when one exists, console.warn otherwise (headless sessions have no other
+ * when one exists, diagLog to the file diagnostics log otherwise (headless
  * channel). */
 export function recordStaleCtxSkip(
   runtime: {
@@ -63,7 +64,7 @@ export function recordStaleCtxSkip(
     `compaction ran (in-memory sessions disposed right after agent_end lose this race); ` +
     `see /blackhole-memory status`;
   notifySafely(hasUI, ui, message, "warning");
-  if (!hasUI) console.warn(message);
+  if (!hasUI) diagLog(message);
 }
 
 function notifySafely(

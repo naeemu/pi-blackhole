@@ -12,6 +12,7 @@ import { existsSync, mkdirSync, renameSync, statSync, unlinkSync, appendFileSync
 import { appendFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { getAgentDir } from "@earendil-works/pi-coding-agent";
+import { diagLog } from "../pi-base/diag-log.js";
 
 export const DEBUG_LOG_MAX_BYTES = 10 * 1024 * 1024;
 export const DEBUG_LOG_RELATIVE_PATH = join("pi-blackhole", "debug.ndjson");
@@ -68,7 +69,7 @@ async function flushBuffer(): Promise<void> {
     rotateIfNeeded(path);
     await appendFile(path, batch.join(""), "utf-8");
   } catch (error) {
-    console.error("blackhole: debug log write failed", error);
+    diagLog(`blackhole: debug log write failed: ${error instanceof Error ? error.message : String(error)}`);
   } finally {
     flushing = false;
   }
@@ -115,7 +116,7 @@ export function flushDebugLog(): void {
     rotateIfNeeded(path);
     appendFileSync(path, batch.join(""), "utf-8");
   } catch (error) {
-    console.error("blackhole: debug log flush failed", error);
+    diagLog(`blackhole: debug log flush failed: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 

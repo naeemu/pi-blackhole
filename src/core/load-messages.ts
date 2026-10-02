@@ -3,6 +3,7 @@ import type { Message } from "@earendil-works/pi-ai";
 import { renderMessage, type RenderedEntry } from "./render-entries";
 import { isCountedMessageEntry } from "./global-indices.js";
 import { scanSessionEntries } from "./session-lines.js";
+import { diagLog } from "../pi-base/diag-log.js";
 
 export interface LoadedMessages {
   rendered: RenderedEntry[];
@@ -122,7 +123,7 @@ export const loadAllMessages = (
     return { rendered, rawMessages, entryIds };
   }
   if (scan.parseErrors > 0) {
-    console.warn(`blackhole: ${scan.parseErrors} malformed JSONL line(s) in ${sessionFile}`);
+    diagLog(`blackhole: ${scan.parseErrors} malformed JSONL line(s) in ${sessionFile}`);
   }
 
   const result: LoadedMessages = { rendered, rawMessages, entryIds };

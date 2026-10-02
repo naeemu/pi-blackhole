@@ -899,8 +899,11 @@ describe("compactAfterPreset / compactAfterPresets (window-curve presets)", () =
     });
   });
 
-  it("drops presets with no valid anchors or a non-array body (warn)", async () => {
-    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+  it("drops presets with no valid anchors or a non-array body (diag log)", async () => {
+    const diagLogModule = await import("../src/pi-base/diag-log.js");
+    const warn = vi
+      .spyOn(diagLogModule, "diagLog")
+      .mockImplementation(() => {});
     const { loadUnifiedConfig } = await import("../src/core/unified-config.js");
     writeConfig({
       compactAfterPresets: {

@@ -1,4 +1,5 @@
 import type { Model } from "@earendil-works/pi-ai";
+import { diagLog } from "../pi-base/diag-log.js";
 import {
   isFixedTokenThreshold,
   isReserveTokens,
@@ -104,9 +105,7 @@ export function compactThresholdTokens(cfg: CompactThresholdConfig, contextWindo
   if (anchors === undefined) {
     if (!warnedPresetNames.has(name)) {
       warnedPresetNames.add(name);
-      console.warn(
-        `blackhole: unknown compaction preset "${name}" — falling back to the built-in "default" curve`,
-      );
+      diagLog(`blackhole: unknown compaction preset "${name}" — falling back to the built-in "default" curve`);
     }
     return Math.max(
       1,

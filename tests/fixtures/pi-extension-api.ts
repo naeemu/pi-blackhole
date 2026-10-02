@@ -47,6 +47,7 @@ export function createExtensionApiDouble(options: ExtensionApiDoubleOptions = {}
     setSessionName: notImplemented("setSessionName"),
     getSessionName: notImplemented("getSessionName"),
     setLabel: notImplemented("setLabel"),
+    getSettings: notImplemented("getSettings"),
     exec: notImplemented("exec"),
     getActiveTools: notImplemented("getActiveTools"),
     getAllTools: notImplemented("getAllTools"),
@@ -57,6 +58,11 @@ export function createExtensionApiDouble(options: ExtensionApiDoubleOptions = {}
     setThinkingLevel: notImplemented("setThinkingLevel"),
     registerProvider: notImplemented("registerProvider"),
     unregisterProvider: notImplemented("unregisterProvider"),
+    registerMcpServer: notImplemented("registerMcpServer"),
+    unregisterMcpServer: notImplemented("unregisterMcpServer"),
+    getMcpServers: notImplemented("getMcpServers"),
+    registerVirtualModel: notImplemented("registerVirtualModel"),
+    unregisterVirtualModel: notImplemented("unregisterVirtualModel"),
     events: createEventBus(),
   };
 }
