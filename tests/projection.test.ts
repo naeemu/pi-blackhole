@@ -581,11 +581,12 @@ describe("buildCompactionProjection reflection cap (#69)", () => {
 
   it("caps reflections newest-first to reflectionsPoolMaxTokens", async () => {
     const { buildCompactionProjection } = await import("../src/om/ledger/projection.js");
-    // Each reflection renders to ~104 tokens; budget 350 fits the newest three.
+    // #512: each reflection line (415 chars) renders to 119 tokens at
+    // 3.5 chars/token; budget 357 (three joined lines + separators) fits the newest three.
     const reflections = bigReflections(10);
     const result = buildCompactionProjection(reflectEntries(reflections), "pad", {
       observationsPoolMaxTokens: 20_000,
-      reflectionsPoolMaxTokens: 350,
+      reflectionsPoolMaxTokens: 357,
       fullFoldAlways: true,
     });
     expect(result.reflections.map((r) => r.id)).toEqual(reflections.slice(-3).map((r) => r.id));

@@ -18,6 +18,7 @@ import { join } from "node:path";
 import type { ExtensionContext } from "@earendil-works/pi-coding-agent";
 import { ConfigManager } from "../pi-base/config-manager.js";
 import { getPiAgentDir } from "../pi-base/paths.js";
+import { diagLog } from "./diag-log.js";
 import { DECLARATIVE_ENV_OVERRIDES } from "../core/config-env.js";
 import { normalizeSubagentMemoryMode } from "../core/subagent-detector.js";
 import {
@@ -531,9 +532,7 @@ export const config = new ConfigManager<UnifiedConfig>({
     if (envCompaction !== undefined) {
       const trimmed = envCompaction.trim().toLowerCase();
       if (!["auto", "manual", "off"].includes(trimmed)) {
-        console.warn(
-          `blackhole: invalid PI_BLACKHOLE_COMPACTION value "${envCompaction}"; ignoring`,
-        );
+        diagLog(`blackhole: invalid PI_BLACKHOLE_COMPACTION value "${envCompaction}"; ignoring`);
       }
     }
 
@@ -541,7 +540,7 @@ export const config = new ConfigManager<UnifiedConfig>({
     if (envCompactionEngine !== undefined) {
       const trimmed = envCompactionEngine.trim().toLowerCase();
       if (!["blackhole", "pi-default"].includes(trimmed)) {
-        console.warn(
+        diagLog(
           `blackhole: invalid PI_BLACKHOLE_COMPACTION_ENGINE value "${envCompactionEngine}"; ignoring`,
         );
       }
@@ -551,7 +550,7 @@ export const config = new ConfigManager<UnifiedConfig>({
     if (envCompactionSummaryMode !== undefined) {
       const trimmed = envCompactionSummaryMode.trim().toLowerCase();
       if (!["default", "append"].includes(trimmed)) {
-        console.warn(
+        diagLog(
           `blackhole: invalid PI_BLACKHOLE_COMPACTION_SUMMARY_MODE value "${envCompactionSummaryMode}"; ignoring`,
         );
       }
@@ -560,7 +559,7 @@ export const config = new ConfigManager<UnifiedConfig>({
     if (envMidRunCompaction !== undefined) {
       const trimmed = envMidRunCompaction.trim().toLowerCase();
       if (!["resume", "pause", "off"].includes(trimmed)) {
-        console.warn(
+        diagLog(
           `blackhole: invalid PI_BLACKHOLE_MID_RUN_COMPACTION value "${envMidRunCompaction}"; ignoring`,
         );
       }
@@ -571,7 +570,7 @@ export const config = new ConfigManager<UnifiedConfig>({
       envSubagentMemory.trim() !== "" &&
       normalizeSubagentMemoryMode(envSubagentMemory) === undefined
     ) {
-      console.warn(
+      diagLog(
         `blackhole: invalid PI_BLACKHOLE_SUBAGENT_MEMORY value "${envSubagentMemory}"; ignoring`,
       );
     }

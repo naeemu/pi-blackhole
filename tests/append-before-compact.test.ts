@@ -124,7 +124,8 @@ describe("append before-compact integration", () => {
     const { invoke } = createHarness({
       compactionSummaryMode: "default",
       tailBehavior: "pi-default",
-      retainedToolOutputMaxTokens: 2,
+      // #512: budget 3 — "n".repeat(8) estimates to 3 at 3.5 chars/token (was 2 at chars/4)
+      retainedToolOutputMaxTokens: 3,
     });
     const input = event(branchEntries);
     input.preparation.firstKeptEntryId = "m3";
@@ -134,8 +135,8 @@ describe("append before-compact integration", () => {
 
     expect(projection).toMatchObject({
       version: 1,
-      retainedTokens: 2,
-      omittedTokens: 3,
+      retainedTokens: 3, // #512: 8 chars → 3 at 3.5 chars/token
+      omittedTokens: 4, // #512: 12 chars → 4 at 3.5 chars/token
       omissions: [
         {
           entryId: "t-old",
@@ -172,7 +173,8 @@ describe("append before-compact integration", () => {
     const { invoke } = createHarness({
       compactionSummaryMode: "default",
       tailBehavior: "pi-default",
-      retainedToolOutputMaxTokens: 2,
+      // #512: budget 3 — "o".repeat(8) estimates to 3 at 3.5 chars/token (was 2 at chars/4)
+      retainedToolOutputMaxTokens: 3,
     });
     const firstEvent = event(firstBranch);
     firstEvent.preparation.firstKeptEntryId = "m3";

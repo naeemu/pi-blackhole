@@ -17,7 +17,9 @@ import { cjkScriptStats } from "../core/segment.js";
 
 export function estimateStringTokens(text: string): number {
   const { count, units } = cjkScriptStats(text);
-  return Math.ceil(count + (text.length - units) / 4);
+  // #512: 3.5 chars/token for non-CJK text — matches pi 1.1.0's internal input
+  // estimate (pi #10497, previously 4) so blackhole numbers track pi's
+  return Math.ceil(count + (text.length - units) / 3.5);
 }
 
 export function hasUsageData(msg: unknown): boolean {
