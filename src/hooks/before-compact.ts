@@ -725,7 +725,7 @@ export const registerBeforeCompactHook = (pi: ExtensionAPI, omRuntime: Runtime) 
     omRuntime.compactionStats = {
       summarized: agentMessages.length,
       kept: keptEntries.length,
-      keptTokensEst: Math.round(keptChars / 4),
+      keptTokensEst: Math.round(keptChars / 3.5), // #512: pi 1.1.0 estimate (was chars/4)
       compactAll: ownCut.compactAll,
       totalUserTurns,
       keptUserTurns,

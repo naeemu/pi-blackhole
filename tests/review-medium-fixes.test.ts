@@ -480,8 +480,10 @@ describe("M4: drain re-evaluates size-skips against the smaller remainder", () =
 describe("M5: a turn-cap-only record still allows shrink-to-fit", () => {
   test("observer shrinks after a turn-cap when the largest window was skipped", async () => {
     const entries = [
-      rawMessage("m0", textForTokens(20_000, "M5-A")),
-      rawMessage("m1", textForTokens(20_000, "M5-B")),
+      // #512: 17.5k × 4 chars each = 140k chars ≈ 40k tokens at 3.5 chars/token
+      // (the same ~40k chunk the test was written around at chars/4).
+      rawMessage("m0", textForTokens(17_500, "M5-A")),
+      rawMessage("m1", textForTokens(17_500, "M5-B")),
     ];
     const runtime = observerRuntime(100, 1_000_000);
     runtime.config.observerModel = { provider: "test-m5", id: "m5-a", cooldownHours: 0 };
