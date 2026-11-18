@@ -25,7 +25,9 @@ import {
 // ── fixtures ─────────────────────────────────────────────────────────────────
 
 function msg(id: string, tokens: number) {
-  return { type: "custom_message", id, content: "x".repeat(tokens * 4) };
+  // #512: sized at pi 1.1.0's 3.5 chars/token rate (was chars/4) so the
+  // "tokens" parameter stays the gauge input.
+  return { type: "custom_message", id, content: "x".repeat(Math.round(tokens * 3.5)) };
 }
 
 function observation(id: string, tokenCount: number) {

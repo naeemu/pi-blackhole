@@ -27,9 +27,9 @@ describe("estimateStringTokens — CJK script awareness (#106)", () => {
     expect(estimateStringTokens("。！？")).toBe(3);
   });
 
-  it("leaves pure ASCII at chars/4 (unchanged behavior)", () => {
-    expect(estimateStringTokens("This is English")).toBe(4);
-    expect(estimateStringTokens("hello world")).toBe(3);
+  it("leaves pure ASCII at chars/3.5 (#512: pi 1.1.0 #10497)", () => {
+    expect(estimateStringTokens("This is English")).toBe(5);
+    expect(estimateStringTokens("hello world")).toBe(4);
   });
 
   it("blends mixed CJK + ASCII text", () => {

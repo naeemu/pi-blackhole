@@ -2,6 +2,7 @@ import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "nod
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import * as diagLogModule from "../src/pi-base/diag-log.js";
 import {
   __setTestConfigDir,
   configPath,
@@ -57,11 +58,11 @@ describe("config scaffolding", () => {
 
   it("reports other write failures without throwing", () => {
     const failure = Object.assign(new Error("denied"), { code: "EACCES" });
-    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    const diag = vi.spyOn(diagLogModule, "diagLog").mockImplementation(() => {});
     vi.mocked(writeFileSync).mockImplementationOnce(() => {
       throw failure;
     });
     expect(() => scaffoldConfig()).not.toThrow();
-    expect(error).toHaveBeenCalledWith("blackhole: config scaffold failed", failure);
+    expect(diag).toHaveBeenCalledWith("blackhole: config scaffold failed: denied");
   });
 });

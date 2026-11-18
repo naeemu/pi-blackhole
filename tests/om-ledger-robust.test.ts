@@ -455,9 +455,10 @@ describe("rendered observation budgets", () => {
     const items = [obs(1, "x"), obs(2, "x"), obs(3, "x".repeat(2000))];
     for (const item of items) item.relevance = "high";
     items[2].relevance = "critical";
-    // Pad each complete line to a multiple of four: newline costs an extra token.
+    // #512: pad each complete line to a multiple of 7 — at 3.5 chars/token a
+    // 7-char line is a whole token, so the newline separator costs exactly 1.
     for (const item of items)
-      item.content += "x".repeat((4 - (observationToSummaryLine(item).length % 4)) % 4);
+      item.content += "x".repeat((7 - (observationToSummaryLine(item).length % 7)) % 7);
     const budget = 2 * estimateStringTokens(observationToSummaryLine(items[0]));
     expect(selectPriorObservations(items, budget)).toEqual([items[1]]);
     const selected = selectPriorObservations(items, budget + 1);

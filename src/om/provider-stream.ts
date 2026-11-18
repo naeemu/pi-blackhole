@@ -91,15 +91,19 @@ export type ProviderFetchOption = { fetch?: typeof fetch };
 // consolidation stages share.
 //
 // Mirror of pi core `provider-attribution.ts#getSessionHeaders`
-// (@earendil-works/pi-coding-agent 0.85.1). A shared import is not possible —
-// the package `exports` map blocks `./dist/core/*` subpaths — so this mirrors
-// the rule instead of reusing it. Deliberately scoped to session headers
-// (correctness): pi's default attribution headers (OpenRouter referrer, Nvidia
-// billing origin, Cloudflare UA) are telemetry-only and owned by pi's sdk
-// path; duplicating them here would fork non-breaking behavior. Requests
-// succeed without them, but OpenCode Go rejects requests without a stable
-// `x-opencode-session` (400 MissingSessionID). Re-check against pi core when
-// bumping the pi dependency. Future provider rules belong in
+// (originally @earendil-works/pi-coding-agent 0.85.1). A shared import is not
+// possible — the package `exports` map blocks `./dist/core/*` subpaths — so
+// this mirrors the rule instead of reusing it. Deliberately scoped to session
+// headers (correctness): pi's default attribution headers (OpenRouter
+// referrer, Nvidia billing origin, Cloudflare UA) are telemetry-only and owned
+// by pi's sdk path; duplicating them here would fork non-breaking behavior.
+// Requests succeed without them, but OpenCode Go rejects requests without a
+// stable `x-opencode-session` (400 MissingSessionID). Re-verified against
+// pi 1.4.0 (2026-10-29, #521): attribution now derives from pi-ai's client
+// identity (name "pi"), so the hardcoded `x-opencode-client: pi` stays
+// wire-compatible; 1.4.0 sends it whenever attribution is enabled, which this
+// mirror already does unconditionally. Re-check against pi core when bumping
+// the pi dependency. Future provider rules belong in
 // `withProviderAttributionHeaders` — never at the stage call sites.
 /** Host pi core attributes OpenCode session headers to (exact match). */
 export const OPENCODE_HOST = "opencode.ai";

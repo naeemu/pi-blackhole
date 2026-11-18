@@ -276,8 +276,8 @@ export function lastValidUsageIndex(entries: Entry[], beforeIndex: number, fromI
 
 /**
  * Real context tokens for the branch: the last valid assistant usage
- * strictly after the latest compaction entry, plus the chars/4 estimate
- * for source entries after it.
+ * strictly after the latest compaction entry, plus the 3.5 chars/token
+ * estimate (#512: pi 1.1.0 #10497, was chars/4) for source entries after it.
  *
  * Returns undefined when there is no measurable baseline (no compaction
  * and no valid usage anywhere; or a compaction with no valid assistant
@@ -376,7 +376,7 @@ export function buildExistingObservationsSummary(
   let tokens = 0;
   for (const obs of observations) {
     const line = `[${obs.id}] ${obs.timestamp} [${obs.relevance}] ${obs.content}`;
-    const lineTokens = Math.ceil(line.length / 4);
+    const lineTokens = Math.ceil(line.length / 3.5); // #512: pi 1.1.0 estimate (was chars/4)
     if (tokens + lineTokens > maxTokens && lines.length > 0) break;
     lines.push(line);
     tokens += lineTokens;

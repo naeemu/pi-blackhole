@@ -10,6 +10,7 @@
  */
 import { join } from "node:path";
 import type { CompactionResult } from "@earendil-works/pi-coding-agent";
+import * as diagLogModule from "../src/pi-base/diag-log.js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
@@ -181,7 +182,7 @@ function fakeCtx(branches: TestEntry[][], overrides: Record<string, unknown> = {
   };
 }
 
-const dueBranch = [textCustomMessage("raw-1", "aaaaaaaaaaaa")]; // 3 tokens
+const dueBranch = [textCustomMessage("raw-1", "aaaaaaaaaaaa")]; // 4 tokens (#512: 3.5 chars/token)
 const belowBranch = [textCustomMessage("raw-1", "aaaa")]; // 1 token
 
 describe("V3 compaction trigger (blackhole)", () => {
@@ -214,7 +215,7 @@ describe("V3 compaction trigger (blackhole)", () => {
 
     expect(ctx.compact).toHaveBeenCalledTimes(1);
     expect(ctx.ui.notify).toHaveBeenCalledWith(
-      "Observational memory: compaction threshold reached (~3 tokens); triggering compaction",
+      "Observational memory: compaction threshold reached (~4 tokens); triggering compaction",
       "info",
     );
   });
@@ -405,8 +406,8 @@ describe("V3 compaction trigger (blackhole)", () => {
       expect(ctx.compact).not.toHaveBeenCalled();
     });
 
-    it("headless stale bails use console.warn and never ui.notify", async () => {
-      const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    it("headless stale bails use the diag log and never ui.notify", async () => {
+      const warnSpy = vi.spyOn(diagLogModule, "diagLog").mockImplementation(() => {});
       const { handler, runtime } = captureHandler({ compactAfterTokens: 3 });
 
       try {
@@ -1465,7 +1466,7 @@ describe("Context-window-derived threshold (issue #60)", () => {
 
   it("compacts above a window-derived ratio threshold (0.5 × 100 = 50)", async () => {
     const { handler, runtime } = captureHandler({ compactAfterRatio: 0.5 });
-    const ctx = windowedCtx(100, [textCustomMessage("raw-1", "a".repeat(300))]); // 75 tokens ≥ 50
+    const ctx = windowedCtx(100, [textCustomMessage("raw-1", "a".repeat(300))]); // 86 tokens ≥ 50 (#512)
 
     handler(agentEnd(), ctx);
     expect(runtime.compactInFlight).toBe(true);
@@ -1476,7 +1477,7 @@ describe("Context-window-derived threshold (issue #60)", () => {
 
   it("fires exactly at the derived threshold (tokens == threshold)", async () => {
     const { handler } = captureHandler({ compactAfterRatio: 0.5 });
-    const ctx = windowedCtx(100, [textCustomMessage("raw-1", "a".repeat(200))]); // 50 tokens == 50
+    const ctx = windowedCtx(100, [textCustomMessage("raw-1", "a".repeat(175))]); // 50 tokens == 50 (#512: 175/3.5)
 
     handler(agentEnd(), ctx);
     await flushAll();
@@ -1486,7 +1487,7 @@ describe("Context-window-derived threshold (issue #60)", () => {
 
   it("does not compact below the derived threshold", async () => {
     const { handler, runtime } = captureHandler({ compactAfterRatio: 0.5 });
-    const ctx = windowedCtx(100, [textCustomMessage("raw-1", "a".repeat(196))]); // 49 tokens < 50
+    const ctx = windowedCtx(100, [textCustomMessage("raw-1", "a".repeat(171))]); // 49 tokens < 50 (#512: ceil(171/3.5))
 
     handler(agentEnd(), ctx);
     await flushAll();

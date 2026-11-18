@@ -1992,8 +1992,9 @@ describe("capSourceEntriesToTokens", () => {
       textCustomMessage("cm-5", "y".repeat(100)),
     ];
     const result = capSourceEntriesToTokens(entries, 80);
-    // Prefix walk: rawMessage ≈ 50, cm-1 → 75 ≤ 80, cm-2 would push to
-    // 100 > 80 → stop. A 0-token custom_message estimate would keep all five.
+    // #512: rawMessage ≈ 50 (pi's estimateTokens, chars/4); cm-1 → 79 ≤ 80
+    // (29 @ 3.5 chars/token), cm-2 would push to 108 > 80 → stop.
+    // A 0-token custom_message estimate would keep all five.
     expect(result.map((e) => e.id)).toEqual(["m0", "cm-1"]);
   });
 
@@ -2009,10 +2010,11 @@ describe("capSourceEntriesToTokens", () => {
         { type: "text", text: "part four" },
       ]),
     ];
-    const result = capSourceEntriesToTokens(entries, 55);
-    // Each array custom_message ≈ 5 tokens. rawMessage ≈ 50 tokens.
-    // Prefix: m0 → 50, cm-1 → 55 ≤ 55, cm-2 would push to 60 > 55 → stop.
+    // #512: rawMessage ≈ 50 (pi's estimateTokens, chars/4); array custom_message
+    // blocks estimate at 3.5 chars/token: cm-1 ≈ 6, cm-2 ≈ 7.
+    // Prefix: m0 → 50, cm-1 → 56 ≤ 56, cm-2 would push to 63 > 56 → stop.
     // A 0-token estimate would keep cm-2 as well.
+    const result = capSourceEntriesToTokens(entries, 56);
     expect(result.map((e) => e.id)).toEqual(["m0", "cm-1"]);
   });
 
@@ -2045,8 +2047,10 @@ describe("capSourceEntriesToTokens", () => {
       branchSummary("bs1", "c".repeat(400)), // ~100 tokens
       rawMessage("m2", "d".repeat(400)), // ~100 tokens
     ];
-    // Prefix walk: m1 → 100, cm1 → 200, bs1 → 300 ≤ 300; m2 would push to 400.
-    const result = capSourceEntriesToTokens(entries, 300);
+    // #512: mixed rates — rawMessage/branch_summary via pi's estimateTokens
+    // (chars/4: 100 each); custom_message string via estimateStringTokens
+    // (3.5: 115). Prefix: m1 → 100, cm1 → 215, bs1 → 330 ≤ 330; m2 → 430.
+    const result = capSourceEntriesToTokens(entries, 330);
     expect(result.map((e) => e.id)).toEqual(["m1", "cm1", "bs1"]);
   });
 

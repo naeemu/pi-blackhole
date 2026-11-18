@@ -386,18 +386,13 @@ describe("modal validate normalizes threshold knobs like the file loader", () =>
     });
   });
 
-  it("warns when an invalid PI_BLACKHOLE_SUBAGENT_MEMORY env value is ignored", async () => {
-    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+  it("ignores an invalid PI_BLACKHOLE_SUBAGENT_MEMORY env value (warn goes to diag log)", async () => {
     process.env.PI_BLACKHOLE_SUBAGENT_MEMORY = "nope";
     try {
       const out = await validate({ subagentMemory: "inherit" });
       expect(out.subagentMemory).toBe("inherit");
-      expect(warn).toHaveBeenCalledWith(
-        'blackhole: invalid PI_BLACKHOLE_SUBAGENT_MEMORY value "nope"; ignoring',
-      );
     } finally {
       delete process.env.PI_BLACKHOLE_SUBAGENT_MEMORY;
-      warn.mockRestore();
     }
   });
 

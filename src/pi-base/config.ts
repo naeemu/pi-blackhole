@@ -16,6 +16,7 @@ import { mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:f
 import { dirname, join, sep } from "node:path";
 import { tmpdir } from "node:os";
 import { getExtensionsDir } from "./paths.js";
+import { diagLog } from "./diag-log.js";
 
 export { getExtensionsDir } from "./paths.js";
 
@@ -73,7 +74,7 @@ function guardRealDir(
 
   const dir = resolveConfigDir(configDir);
   if (isRealDir(dir)) {
-    console.warn(
+    diagLog(
       `[pi-base] Blocked ${operation} of "${filename}" — running in vitest ` +
         `without explicit configDir, and the target directory (${dir}) ` +
         `looks like a real user home. ` +
@@ -158,7 +159,7 @@ export function writeConfig<T>(filename: string, data: T, configDir?: string): b
     writeFileSync(path, `${JSON.stringify(data, null, 2)}\n`, "utf-8");
     return true;
   } catch (error) {
-    console.warn(
+    diagLog(
       `[pi-base] Failed to write "${path}": ${error instanceof Error ? error.message : String(error)}`,
     );
     return false;

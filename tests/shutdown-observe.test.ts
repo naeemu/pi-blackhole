@@ -11,6 +11,7 @@ import { observation, rawMessage } from "./fixtures/session.js";
 import { readPendingState } from "../src/om/pending.js";
 import { SHUTDOWN_OBSERVE_TIMEOUT_MS } from "../src/om/shutdown-observe.js";
 import { flushDebugLog, DEBUG_LOG_RELATIVE_PATH } from "../src/om/debug-log.js";
+import { ROOT_SESSIONS_ENV } from "../src/core/subagent-detector.js";
 const scratch = vi.hoisted(() => ({ dir: "" }));
 vi.mock("@earendil-works/pi-coding-agent", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@earendil-works/pi-coding-agent")>()),
@@ -24,7 +25,13 @@ let ctx: ConsolidationCtx;
 const releases: Array<() => void> = [];
 const appended = vi.fn();
 const pi = createExtensionApiDouble({ appendEntry: appended });
+const savedRootSessionsEnv: { value: string | undefined } = { value: undefined };
 beforeEach(() => {
+  // #533: isolate from a live pi session — the ambient root-sessions env
+  // (set by a running main session) would classify "shutdown-test" as a
+  // subagent and skip all observation work under test.
+  savedRootSessionsEnv.value = process.env[ROOT_SESSIONS_ENV];
+  delete process.env[ROOT_SESSIONS_ENV];
   scratch.dir = mkdtempSync(join(tmpdir(), "om-shutdown-test-"));
   runtime = new Runtime();
   runtime.config.observeOnShutdown = true;
@@ -49,6 +56,8 @@ beforeEach(() => {
   vi.spyOn(runtime, "dispose");
 });
 afterEach(async () => {
+  if (savedRootSessionsEnv.value === undefined) delete process.env[ROOT_SESSIONS_ENV];
+  else process.env[ROOT_SESSIONS_ENV] = savedRootSessionsEnv.value;
   for (const release of releases.splice(0)) release();
   vi.useRealTimers();
   await new Promise((resolve) => setTimeout(resolve, 0));
