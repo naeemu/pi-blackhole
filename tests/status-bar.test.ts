@@ -25,9 +25,10 @@ import {
 // ── fixtures ─────────────────────────────────────────────────────────────────
 
 function msg(id: string, tokens: number) {
-  // #512: sized at pi 1.1.0's 3.5 chars/token rate (was chars/4) so the
-  // "tokens" parameter stays the gauge input.
-  return { type: "custom_message", id, content: "x".repeat(Math.round(tokens * 3.5)) };
+  // Branch summaries keep the compaction-gauge token math (ceil(chars/4)) while
+  // staying observer source entries; custom_message no longer counts (excluded
+  // from observer accounting).
+  return { type: "branch_summary", id, summary: "x".repeat(tokens * 4) };
 }
 
 function observation(id: string, tokenCount: number) {
