@@ -48,8 +48,7 @@ describe("applyToolOutputBudget", () => {
       },
     ];
 
-    // #512: budget 3 — ceil(8/3.5)=3 keeps the "new" output inside the budget (was 2 at chars/4)
-    const projection = buildRetainedToolOutputProjection(entries, entries, 3);
+    const projection = buildRetainedToolOutputProjection(entries, entries, 2);
     const messages = entries.map((entry) => structuredClone(entry.message));
     const projected = applyRetainedToolOutputProjection(messages, entries, projection);
 
@@ -94,7 +93,7 @@ describe("applyToolOutputBudget", () => {
 
     expect(projection.omissions).toEqual([]);
     expect(projection.omittedTokens).toBe(0);
-    expect(projection.retainedTokens).toBe(6); // #512: ceil(20/3.5) = 6 (was 5 at chars/4)
+    expect(projection.retainedTokens).toBe(5);
     expect(projected).toBe(messages);
     expect(projected[0]).toBe(output.message);
   });
@@ -155,11 +154,10 @@ describe("applyToolOutputBudget", () => {
       { role: "assistant", content: "consumed" },
     ];
 
-    // #512: budget 3 — "12345678" (8 chars) estimates to 3 at pi 1.1.0's 3.5 chars/token (was 2 at chars/4)
-    const result = applyToolOutputBudget(messages, 3);
+    const result = applyToolOutputBudget(messages, 2);
 
     expect(result.messages).toBe(messages);
-    expect(result.retainedTokens).toBe(3);
+    expect(result.retainedTokens).toBe(2);
     expect(result.omittedCount).toBe(0);
   });
 

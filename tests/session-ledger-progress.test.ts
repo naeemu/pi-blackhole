@@ -73,9 +73,9 @@ describe("session-ledger V3 progress helpers", () => {
       branchSummary("sum-1", "cccccccccccc"),
     ];
 
-    expect(rawTokensAfterIndex(entries, 0)).toBe(7); // raw-2: 3 + sum-1: 4 (#512: 3.5 chars/token)
-    expect(rawTokensAfterIndex(entries, 1)).toBe(7);
-    expect(rawTokensAfterIndex(entries, 2)).toBe(4);
+    expect(rawTokensAfterIndex(entries, 0)).toBe(5); // raw-2: 2 + sum-1: 3
+    expect(rawTokensAfterIndex(entries, 1)).toBe(5);
+    expect(rawTokensAfterIndex(entries, 2)).toBe(3);
   });
 
   it("uses independent coverage clocks for observations, reflections, and drops", () => {
@@ -98,9 +98,9 @@ describe("session-ledger V3 progress helpers", () => {
       branchSummary("raw-4", "dddddddddddddddd"),
     ];
 
-    expect(rawTokensSinceObservationCoverage(entries)).toBe(12); // raw-2: 3 + raw-3: 4 + raw-4: 5 (#512)
-    expect(rawTokensSinceReflectionCoverage(entries)).toBe(9); // raw-3: 4 + raw-4: 5 (#512)
-    expect(rawTokensSinceDropCoverage(entries)).toBe(9); // covers ledger entry om-eeeeeeeeeeee, raw after it (#512)
+    expect(rawTokensSinceObservationCoverage(entries)).toBe(9); // raw-2 + raw-3 + raw-4
+    expect(rawTokensSinceReflectionCoverage(entries)).toBe(7); // raw-3 + raw-4
+    expect(rawTokensSinceDropCoverage(entries)).toBe(7); // covers ledger entry om-eeeeeeeeeeee, raw after it
   });
 
   it("lets coversUpToId point to a memory ledger entry", () => {
@@ -118,7 +118,7 @@ describe("session-ledger V3 progress helpers", () => {
     ];
 
     expect(latestCoverageIndex(entries, V3_OBSERVATIONS_DROPPED)).toBe(1);
-    expect(rawTokensSinceDropCoverage(entries)).toBe(3); // #512: ceil(8/3.5)
+    expect(rawTokensSinceDropCoverage(entries)).toBe(2);
   });
 
   it("chooses the max covered branch position, not merely latest ledger entry order", () => {
@@ -138,7 +138,7 @@ describe("session-ledger V3 progress helpers", () => {
 
     expect(latestCoverageIndex(entries, V3_OBSERVATIONS_RECORDED)).toBe(1);
     expect(latestCoverageMarkerId(entries, V3_OBSERVATIONS_RECORDED)).toBe("raw-2");
-    expect(rawTokensSinceObservationCoverage(entries)).toBe(4); // #512: ceil(12/3.5)
+    expect(rawTokensSinceObservationCoverage(entries)).toBe(3);
   });
 
   it("serves unanchored markers to worker inputs but never to coverage clocks", () => {
@@ -165,7 +165,7 @@ describe("session-ledger V3 progress helpers", () => {
     // Coverage side: the unanchored marker moves no clock and claims no point.
     expect(latestCoverageIndex(entries as any, V3_OBSERVATIONS_RECORDED)).toBe(0);
     expect(latestCoverageMarkerId(entries as any, V3_OBSERVATIONS_RECORDED)).toBe("raw-1");
-    expect(rawTokensSinceObservationCoverage(entries as any)).toBe(3); // raw-2 only: ceil(8/3.5) (#512)
+    expect(rawTokensSinceObservationCoverage(entries as any)).toBe(2); // raw-2 only
   });
 
   it("returns latest inner coverage marker and earlier marker by branch index", () => {
@@ -203,7 +203,7 @@ describe("session-ledger V3 progress helpers", () => {
     ];
 
     expect(() => rawTokensSinceObservationCoverage(entries)).not.toThrow();
-    expect(rawTokensSinceObservationCoverage(entries)).toBe(5); // #512: ceil(4/3.5) + ceil(8/3.5)
+    expect(rawTokensSinceObservationCoverage(entries)).toBe(3);
     expect(latestCoverageIndex(entries, V3_REFLECTIONS_RECORDED)).toBe(-1);
   });
 
@@ -215,7 +215,7 @@ describe("session-ledger V3 progress helpers", () => {
       branchSummary("raw-2", "bbbbbbbb"),
     ];
 
-    expect(rawTokensSinceLastCompaction(entries)).toBe(5); // raw-1: 2 + raw-2: 3 from live tail starting at firstKeptEntryId (#512)
+    expect(rawTokensSinceLastCompaction(entries)).toBe(3); // raw-1 + raw-2 from live tail starting at firstKeptEntryId
   });
 });
 

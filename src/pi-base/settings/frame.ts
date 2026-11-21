@@ -126,7 +126,7 @@ export function formatHintLine(hints: KeyHint[], theme: Theme): string {
  * overlay component — every line is exactly `width` columns wide.
  */
 export function frame(
-  lines: string[],
+  lines: readonly string[],
   width: number,
   theme: Theme,
   options: FrameOptions = {},

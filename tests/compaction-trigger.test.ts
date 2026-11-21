@@ -10,8 +10,8 @@
  */
 import { join } from "node:path";
 import type { CompactionResult } from "@earendil-works/pi-coding-agent";
-import * as diagLogModule from "../src/pi-base/diag-log.js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import * as diagLogModule from "../src/pi-base/diag-log.js";
 
 import {
   recordMidRunFailure,
@@ -215,7 +215,7 @@ describe("V3 compaction trigger (blackhole)", () => {
 
     expect(ctx.compact).toHaveBeenCalledTimes(1);
     expect(ctx.ui.notify).toHaveBeenCalledWith(
-      "Observational memory: compaction threshold reached (~4 tokens); triggering compaction",
+      "Observational memory: compaction threshold reached (~3 tokens); triggering compaction",
       "info",
     );
   });
